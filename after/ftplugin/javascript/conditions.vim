@@ -11,10 +11,12 @@ let s:opener_keywords = [
 \      'if',
 \      'while',
 \      'for',
+\      'try'
 \    ]
 
 let s:continuator_keywords = [
-\      'else'
+\      'else',
+\      'catch'
 \    ]
 
 function! s:to_regexp(arr)
