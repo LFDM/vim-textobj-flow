@@ -34,6 +34,24 @@ let s:start_pattern = s:ws . s:openers
 let s:continuation_pattern = s:ws . s:continuators
 let s:full_pattern = s:ws . '(' . s:openers. '|' . s:continuators. ')'
 
+
+function! s:select_a()
+  let positions = s:find_positions(1)
+  if positions isnot 0
+    return positions
+  endif
+endfunction
+
+function! s:select_i()
+  let positions = s:find_positions(0)
+  if positions isnot 0
+    let [_, start, end] = positions
+    let start[1] = start[1] + 1
+    let end[1] = end[1] - 1
+    return positions
+  endif
+endfunction
+
 function! s:find_positions(around)
   let orig_pos = getpos('.')
   let pattern = a:around ? s:start_pattern : s:full_pattern
@@ -85,23 +103,6 @@ endfunction
 function! s:to_selector(start_pos, end_pos)
   if a:start_pos isnot 0 && a:end_pos isnot 0
     return ['V', a:start_pos, a:end_pos]
-  endif
-endfunction
-
-function! s:select_a()
-  let positions = s:find_positions(1)
-  if positions isnot 0
-    return positions
-  endif
-endfunction
-
-function! s:select_i()
-  let positions = s:find_positions(0)
-  if positions isnot 0
-    let [_, start, end] = positions
-    let start[1] = start[1] + 1
-    let end[1] = end[1] - 1
-    return positions
   endif
 endfunction
 
