@@ -176,7 +176,7 @@ while  |<Plug>(text-obj-flow-i)| will select only the body of the structure,
 without the closing semicolon. (V indicates the selection)
 >
 	    while (obj.counter) *decrementCounter(obj);
-                               VVVVVVVVVVVVVVVVVVVVVV
+                                 VVVVVVVVVVVVVVVVVVVV
 
 
 If the cursor does not reside on or inside a valid textobject, the plugin
