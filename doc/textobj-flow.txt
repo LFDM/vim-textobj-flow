@@ -1,0 +1,197 @@
+*textobj-flow.txt*	Text objects for flow structures
+
+Copyright (C) 2015 Gernot Hoeflechner <http://github.com/LFDM.net/>
+License: So-called MIT license  {{{
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+}}}
+
+CONTENTS					*textobj-flow-contents*
+
+Introduction		|textobj-flow-introduction|
+Interface		|textobj-flow-interface|
+  Mappings		  |textobj-flow-mappings|
+Customizing		|textobj-flow-customizing|
+Examples		|textobj-flow-examples|
+  Javascript		  |textobj-flow-javascript|
+Bugs			|textobj-flow-bugs|
+
+
+
+
+==============================================================================
+INTRODUCTION					*textobj-flow-introduction*
+
+*textobj-flow* is a filetype-dependent Vim plugin to provide text objects to
+select the flow structures like if conditionals or for loops.
+Check out the |textobj-flow-examples|.
+
+Requirements:
+- Vim 7.2 or later
+- |textobj-user| 0.3.7 or later (vimscript#2100)
+
+Latest version:
+https://github.com/LFDM/vim-textobj-flow
+
+
+
+==============================================================================
+INTERFACE					*textobj-flow-interface*
+
+------------------------------------------------------------------------------
+MAPPINGS					*textobj-flow-mappings*
+
+These key mappings are defined in Visual mode and Operator-pending mode.
+
+<Plug>(textobj-flow-a)			*<Plug>(textobj-flow-a)*
+			Select around a flow structure.
+
+<Plug>(textobj-flow-i)			*<Plug>(textobj-flow-i)*
+			Select the body of a flow structure.
+
+
+
+==============================================================================
+CUSTOMIZING					*textobj-flow-customizing*
+
+				    *g:textobj_flow_no_default_key_mappings*
+					    *:TextobjFlowDefaultKeyMappings*
+This plugin will define the following key mappings in Visual mode and
+Operator-pending mode automatically.  If you don't want these key mappings,
+define |g:textobj_flow_no_default_key_mappings| before this plugin is loaded
+(e.g. in your |vimrc|).  You can also use |:TextobjFlowDefaultKeyMappings|
+to redefine these key mappings.  This command doesn't override existing {lhs}s
+unless [!] is given.
+The default c mapping is a mnemomic for 'conditional'.
+
+	{lhs}	{rhs}			~
+	-----	----------------------	~
+	ac	<Plug>(textobj-flow-a)
+	ic	<Plug>(textobj-flow-i)
+
+
+
+==============================================================================
+EXAMPLES						*textobj-flow-examples*
+
+------------------------------------------------------------------------------
+JAVASCRIPT					*textobj-flow-javascript*
+
+Supported structures:
+        if
+        while
+        for
+        try
+        switch
+
+        else
+        catch
+
+(* indicates the current cursor position, | a selected line)
+>
+	   if (isTrue()) {
+             doThing();
+             doOtherThing();
+             *return;
+           }
+
+|<Plug>(text-obj-flow-a)| will select
+>
+	  |*if (isTrue()) {
+          |  doThing();
+          |  doOtherThing();
+          |  return;
+          |}
+
+while |<Plug>(text-obj-flow-i)| will select
+>
+	   *if (isTrue()) {
+          |  *doThing();
+          |  doOtherThing();
+          |  return;
+           }
+
+If flow structures are continued, like an if/else conditional,
+|<Plug>(text-obj-flow-a)| will select the complete structure, while
+|<Plug>(text-obj-flow-i)| will select only inside the current branch.
+>
+	   if (isTrue()) {
+             doThing();
+             doOtherThing();
+             return;
+           } else {
+             *doSomethingElse();
+             return;
+           }
+
+|<Plug>(text-obj-flow-a)| will select
+>
+	  |*if (isTrue()) {
+          |  doThing();
+          |  doOtherThing();
+          |  return;
+          |} else {
+          |  doSomethingElse();
+          |  return;
+          |}
+
+while |<Plug>(text-obj-flow-i)| will select
+>
+	   if (isTrue()) {
+             doThing();
+             doOtherThing();
+             return;
+           } else {
+          |  *doSomethingElse();
+          |  return;
+           }
+
+
+One-line structures are also handled properly
+>
+	    *while (obj.counter) decrementCounter(obj);
+
+|<Plug>(text-obj-flow-a)| will select the whole line
+
+>
+	   |*while (obj.counter) decrementCounter(obj);
+
+while  |<Plug>(text-obj-flow-i)| will select only the body of the structure,
+without the closing semicolon. (V indicates the selection)
+>
+	    while (obj.counter) *decrementCounter(obj);
+                               VVVVVVVVVVVVVVVVVVVVVV
+
+
+If the cursor does not reside on or inside a valid textobject, the plugin
+tries to select the next textobject in the document.
+
+
+
+==============================================================================
+BUGS						*textobj-flow-bugs*
+
+- [count] is just ignored.
+
+- See |textobj-user-bugs| for further information.
+
+
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:fen:fdl=0:fdm=marker:
