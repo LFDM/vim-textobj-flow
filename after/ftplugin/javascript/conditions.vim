@@ -47,6 +47,15 @@ function! s:select_a()
   if positions isnot 0
     return positions
   endif
+
+function! s:select_i()
+  let positions = s:find_positions(0)
+  if positions isnot 0
+    let [_, start, end] = positions
+    let start[1] = start[1] + 1
+    let end[1] = end[1] - 1
+    return positions
+  endif
 endfunction
 
 function! s:orig_inside_selection(orig, start, end)
