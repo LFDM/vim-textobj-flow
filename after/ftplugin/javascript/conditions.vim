@@ -32,10 +32,12 @@ let s:continuators = '\}\s*' . s:to_regexp(s:continuator_keywords)
 
 let s:start_pattern = s:ws . s:openers
 let s:continuation_pattern = s:ws . s:continuators
+let s:full_pattern = s:ws . '(' . s:openers. '|' . s:continuators. ')'
 
 function! s:find_positions(around)
   let orig_pos = getpos('.')
-  let pattern = s:start_pattern
+  let pattern = a:around ? s:start_pattern : s:full_pattern
+  echom pattern
 
   " Check if we are on the correct line already
   if getline('.') =~ pattern
