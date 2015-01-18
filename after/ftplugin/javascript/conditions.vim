@@ -16,10 +16,7 @@ let s:continuation_pattern = s:ws + '{\s*' + s:continuators
 "let s:end_pattern = s:comment_escape . '\zs<}>'
 "let s:skip_pattern = 'getline(".") =~ "\\v\\S\\s<(if|unless)>\\s\\S"'
 
-function! s:find_positions()
-endfunction
-
-function! s:select_a()
+function! s:find_positions(continue)
   let orig_pos = getpos('.')
 
   " Check if we are on the correct line already
@@ -38,12 +35,23 @@ function! s:select_a()
 
   let end_pos = s:jump_to_match()
 
-  if end_pos == []
-    call setpos('.', orig_pos)
-    return
-  else
-    return ['V', start_pos, end_pos]
+  if end_pos isnot 0
+    if s:orig_inside_selection(orig_pos, start_pos, end_pos)
+      return ['V', start_pos, end_pos]
+    endif
   endif
+endfunction
+
+function! s:select_a()
+  let positions = s:find_positions(1)
+  if positions isnot 0
+    return positions
+  endif
+endfunction
+
+function! s:orig_inside_selection(orig, start, end)
+  let line = a:orig[1]
+  return line >= a:start[1] && line <= a:end[1]
 endfunction
 
 function! s:jump_to_match()
@@ -51,7 +59,7 @@ function! s:jump_to_match()
   normal! $
 
   let pos = getpos('.')
-  let char = getline('.')[getpos('.')[2] - 1]
+  let char = getline('.')[pos[2] - 1]
 
   " Check if we are on a one line conditional
   if char == ';'
@@ -59,10 +67,9 @@ function! s:jump_to_match()
   " If we are on a brace, we jump to the closing brace
   elseif char == "{"
     normal %
-    return getpos('')
+    return getpos('.')
     " Jump through else
-  " Otherwise we have no valid match
-  else
-    return []
   endif
+
+  " Otherwise we have no valid match
 endfunction
