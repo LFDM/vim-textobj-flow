@@ -11,7 +11,8 @@ let s:opener_keywords = [
 \      'if',
 \      'while',
 \      'for',
-\      'try'
+\      'try',
+\      'switch'
 \    ]
 
 let s:continuator_keywords = [
