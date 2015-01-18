@@ -1,5 +1,5 @@
 " Interface  "{{{1
-call textobj#user#plugin('conditions', {
+call textobj#user#plugin('flow', {
 \      '-': {
 \        '*sfile*': expand('<sfile>:p'),
 \        'select-a': 'ac',  '*select-a-function*': 's:select_a',
@@ -50,9 +50,9 @@ function! s:select_i()
     let start_line = start[1]
     let end_line   = end[1]
 
-    " Special case when we are dealing with a one-line conditional!
+    " Special case when we are dealing with a one-line flow structure!
     if start_line == end_line
-      " Move across the condition
+      " Move across the flow structure
       normal! ^w
       normal %
       normal w
@@ -137,7 +137,7 @@ function! s:jump_to_match(continue)
   let pos = getpos('.')
   let char = getline('.')[pos[2] - 1]
 
-  " Check if we are on a one line conditional
+  " Check if we are on a one line flow structure
   if char == ';'
     return pos
   " If we are on a brace, we jump to the closing brace
@@ -146,7 +146,7 @@ function! s:jump_to_match(continue)
     let pos = getpos('.')
 
     if a:continue
-      " Include things like an else in an if condition
+      " Include things like an else in an if conditional
       return s:jump_to_continuator(pos)
     else
       return pos
