@@ -24,8 +24,6 @@ function! s:to_regexp(arr)
   return start . join(elements, '|'). end
 endfunction
 
-echo s:to_regexp(s:opener_keywords)
-
 let s:ws = '\v^\s*'
 let s:openers = s:to_regexp(s:opener_keywords)
 let s:continuators = '\}\s*' . s:to_regexp(s:continuator_keywords)
