@@ -7,24 +7,42 @@ call textobj#user#plugin('conditions', {
 \      }
 \    })
 
-" Misc.  "{{{1
-let s:ws = '\v^\s*'
-let s:openers = '\zs(<if>|<while>|<for>)'
-let s:continuators = '\zs(<else>)'
-let s:start_pattern = s:ws . s:openers
-let s:continuation_pattern = s:ws . '\}\s*' . s:continuators
-"let s:end_pattern = s:comment_escape . '\zs<}>'
-"let s:skip_pattern = 'getline(".") =~ "\\v\\S\\s<(if|unless)>\\s\\S"'
+let s:opener_keywords = [
+\      'if',
+\      'while',
+\      'for',
+\    ]
 
-function! s:find_positions(continue)
+let s:continuator_keywords = [
+\      'else'
+\    ]
+
+function! s:to_regexp(arr)
+  let start = '\zs('
+  let elements = map(a:arr, '"<" . v:val . ">"')
+  let end = ')'
+  return start . join(elements, '|'). end
+endfunction
+
+echo s:to_regexp(s:opener_keywords)
+
+let s:ws = '\v^\s*'
+let s:openers = s:to_regexp(s:opener_keywords)
+let s:continuators = '\}\s*' . s:to_regexp(s:continuator_keywords)
+
+let s:start_pattern = s:ws . s:openers
+let s:continuation_pattern = s:ws . s:continuators
+
+function! s:find_positions(around)
   let orig_pos = getpos('.')
+  let pattern = s:start_pattern
 
   " Check if we are on the correct line already
-  if getline('.') =~ s:start_pattern
+  if getline('.') =~ pattern
     let start_pos = getpos('.')
   else
     " Search backwards but don't wrap
-    call search(s:start_pattern, 'bW')
+    call search(pattern, 'bW')
     let start_pos = getpos('.')
 
     " Cursor has not moved - no match found
@@ -33,7 +51,7 @@ function! s:find_positions(continue)
     endif
   endif
 
-  let end_pos = s:jump_to_match(a:continue)
+  let end_pos = s:jump_to_match(a:around)
 
   if end_pos isnot 0
     if s:orig_inside_selection(orig_pos, start_pos, end_pos)
