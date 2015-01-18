@@ -12,7 +12,7 @@ let s:ws = '\v^\s*'
 let s:openers = '\zs(<if>|<while>|<for>)'
 let s:continuators = '\zs(<else>)'
 let s:start_pattern = s:ws . s:openers
-let s:continuation_pattern = s:ws + '{\s*' + s:continuators
+let s:continuation_pattern = s:ws . '\}\s*' . s:continuators
 "let s:end_pattern = s:comment_escape . '\zs<}>'
 "let s:skip_pattern = 'getline(".") =~ "\\v\\S\\s<(if|unless)>\\s\\S"'
 
