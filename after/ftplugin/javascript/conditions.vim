@@ -51,8 +51,6 @@ function! s:select_i()
 
     " Special case when we are dealing with a one-line conditional!
     if start_line == end_line
-      " Move cursor to the computed start
-      call setpos('.', start)
       " Move across the condition
       normal! ^w
       normal %
