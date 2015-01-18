@@ -75,7 +75,6 @@ endfunction
 function! s:find_positions(around)
   let orig_pos = getpos('.')
   let pattern = a:around ? s:start_pattern : s:full_pattern
-  echom pattern
 
   " Check if we are on the correct line already
   if getline('.') =~ pattern
