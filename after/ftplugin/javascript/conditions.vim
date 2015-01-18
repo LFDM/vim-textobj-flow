@@ -46,9 +46,30 @@ function! s:select_i()
   let positions = s:find_positions(0)
   if positions isnot 0
     let [_, start, end] = positions
-    let start[1] = start[1] + 1
-    let end[1] = end[1] - 1
-    return positions
+    let start_line = start[1]
+    let end_line   = end[1]
+
+    " Special case when we are dealing with a one-line conditional!
+    if start_line == end_line
+      " Move cursor to the computed start
+      call setpos('.', start)
+      " Move across the condition
+      normal! ^w
+      normal %
+      normal w
+      let start = getpos('.')
+      " Move to the end of the line, but don't take the semicolon.
+      " If there is no semicolon this selection will look strange,
+      " which is good, because it provides a hint to the user that
+      " something is wrong with this line anyway
+      normal! $h
+      let end = getpos('.')
+      return ['v', start, end]
+    else
+      let start[1] = start_line + 1
+      let end[1] = end_line - 1
+      return positions
+    endif
   endif
 endfunction
 
