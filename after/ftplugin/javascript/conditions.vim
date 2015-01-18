@@ -33,7 +33,7 @@ function! s:find_positions(continue)
     endif
   endif
 
-  let end_pos = s:jump_to_match()
+  let end_pos = s:jump_to_match(a:continue)
 
   if end_pos isnot 0
     if s:orig_inside_selection(orig_pos, start_pos, end_pos)
@@ -47,6 +47,7 @@ function! s:select_a()
   if positions isnot 0
     return positions
   endif
+endfunction
 
 function! s:select_i()
   let positions = s:find_positions(0)
@@ -77,7 +78,6 @@ function! s:jump_to_match()
   elseif char == "{"
     normal %
     return getpos('.')
-    " Jump through else
   endif
 
   " Otherwise we have no valid match
