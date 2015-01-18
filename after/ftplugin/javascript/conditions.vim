@@ -42,23 +42,49 @@ function! s:find_positions(around)
   " Check if we are on the correct line already
   if getline('.') =~ pattern
     let start_pos = getpos('.')
+    let end_pos = s:jump_to_match(a:around)
+    return s:to_selector(start_pos, end_pos)
+
+  " Search backwards but don't wrap to check if we're inside
+  " a structure we're looking for
   else
-    " Search backwards but don't wrap
     call search(pattern, 'bW')
     let start_pos = getpos('.')
 
     " Cursor has not moved - no match found
     if start_pos == orig_pos
-      return
+      " Try to move forward
+      return s:search_forward(orig_pos, pattern, a:around)
+    else
+      let end_pos = s:jump_to_match(a:around)
+
+      " We found a match, but we have to check if our original
+      " position was inside of this structure. If not this is no
+      " valid match and we search forward again
+      if s:orig_inside_selection(orig_pos, start_pos, end_pos)
+        return s:to_selector(start_pos, end_pos)
+      else
+        return s:search_forward(orig_pos, pattern, a:around)
+      endif
     endif
   endif
+endfunction
 
-  let end_pos = s:jump_to_match(a:around)
+function! s:search_forward(orig_pos, pattern, around)
+  call setpos('.', a:orig_pos)
+  call search(a:pattern, 'W')
+  let start_pos = getpos('.')
 
-  if end_pos isnot 0
-    if s:orig_inside_selection(orig_pos, start_pos, end_pos)
-      return ['V', start_pos, end_pos]
-    endif
+  " Only continue if the cursor has moved
+  if start_pos != a:orig_pos
+    let end_pos = s:jump_to_match(a:around)
+    return s:to_selector(start_pos, end_pos)
+  endif
+endfunction
+
+function! s:to_selector(start_pos, end_pos)
+  if a:start_pos isnot 0 && a:end_pos isnot 0
+    return ['V', a:start_pos, a:end_pos]
   endif
 endfunction
 
