@@ -64,7 +64,7 @@ function! s:orig_inside_selection(orig, start, end)
   return line >= a:start[1] && line <= a:end[1]
 endfunction
 
-function! s:jump_to_match()
+function! s:jump_to_match(continue)
   " Go to the end of the line
   normal! $
 
@@ -77,8 +77,23 @@ function! s:jump_to_match()
   " If we are on a brace, we jump to the closing brace
   elseif char == "{"
     normal %
-    return getpos('.')
-  endif
+    let pos = getpos('.')
 
-  " Otherwise we have no valid match
+    if a:continue
+      " Include things like an else in an if condition
+      return s:jump_to_continuator(pos)
+    else
+      return pos
+    endif
+  endif
+endfunction
+
+function! s:jump_to_continuator(pos)
+  if getline('.') =~ s:continuation_pattern
+    normal! $
+    normal %
+    return s:jump_to_continuator(getpos('.'))
+  else
+    return a:pos
+  endif
 endfunction
